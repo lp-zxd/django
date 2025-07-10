@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医生信息管理 | 医院管理系统</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#6B7280',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                        light: '#F9FAFB',
+                        dark: '#1F2937'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .form-input-focus {
+                @apply focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none;
+            }
+            .btn-hover {
+                @apply hover:shadow-md hover:-translate-y-0.5 transition-all duration-200;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-inter text-dark min-h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-primary text-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <!-- 左侧Logo和标题 -->
+                <div class="flex items-center space-x-2">
+                    <i class="fa fa-hospital-o text-xl"></i>
+                    <span class="text-lg font-bold">医院管理系统</span>
+                </div>
+                
+                <!-- 中间导航链接 - 桌面端 -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="{% url 's_home' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">首页</a>
+                    <a href="{% url 's_patient' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">患者管理</a>
+                    <a href="{% url 's_bed' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">床位管理</a>
+                    <a href="{% url 's_Dr' %}" class="px-3 py-2 rounded-md text-sm font-medium bg-primary/20 text-white">医生管理</a>
+                    <a href="{% url 's_gongju' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">工具管理</a>
+                    <a href="{% url 's_med' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">药物管理</a>
+                </div>
+                
+                <!-- 右侧用户信息和通知 -->
+                <div class="flex items-center space-x-4">
+                    <!-- 通知图标 -->
+                    <button class="p-1 relative group">
+                        <i class="fa fa-bell-o text-lg"></i>
+                        <span class="absolute top-0 right-0 h-2 w-2 bg-danger rounded-full"></span>
+                        <!-- 通知气泡提示 -->
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <span class="text-danger font-medium">新通知</span> - 3条未读
+                            </a>
+                        </div>
+                    </button>
+                    
+                    <!-- 用户信息 - 桌面端 -->
+                    <div class="hidden md:flex items-center space-x-2">
+                        <img src="https://picsum.photos/200/200?random=1" alt="用户头像" class="h-8 w-8 rounded-full object-cover border-2 border-white shadow-sm">
+                        <span>张医生</span>
+                    </div>
+                    
+                    <!-- 移动端菜单按钮 -->
+                    <button class="md:hidden p-2 rounded-md hover:bg-primary/20 focus:outline-none" id="mobile-menu-button">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 移动端导航菜单 -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-primary/10">
+                <a href="{% url 's_home' %}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/20 text-white">首页</a>
+                <a href="{% url 's_patient' %}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/20 text-white">患者管理</a>
+                <a href="{% url 's_bed' %}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/20 text-white">床位管理</a>
+                <a href="{% url 's_Dr' %}" class="block px-3 py-2 rounded-md text-base font-medium bg-primary/20 text-white">医生管理</a>
+                <a href="{% url 's_gongju' %}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/20 text-white">工具管理</a>
+                <a href="{% url 's_med' %}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/20 text-white">药物管理</a>
+            </div>
+            <div class="pt-4 pb-3 border-t border-primary/20">
+                <div class="flex items-center px-5">
+                    <div class="flex-shrink-0">
+                        <img src="https://picsum.photos/200/200?random=1" alt="用户头像" class="h-10 w-10 rounded-full object-cover">
+                    </div>
+                    <div class="ml-3">
+                        <div class="text-base font-medium text-white">张医生</div>
+                        <div class="text-sm font-medium text-primary/80">zhang@hospital.com</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <!-- 页面标题 -->
+        <div class="mb-8">
+            <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-dark mb-2">医生信息管理</h1>
+            <p class="text-secondary">添加或更新医生基本信息</p>
+        </div>
+        
+        <!-- 医生信息表单 -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="p-6">
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- 表单标题 -->
+                    <h2 class="text-xl font-semibold text-dark mb-4">医生基本信息</h2>
+                    
+                    <!-- 表单内容 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- 姓名 -->
+                        <div>
+                            <label for="DrName" class="block text-sm font-medium text-secondary mb-1">ID</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                                <input type="text" id="DrName" name="ID" 
+                                       class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus"
+                                       placeholder="请输入医生ID">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="DrName" class="block text-sm font-medium text-secondary mb-1">姓名</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                                <input type="text" id="DrName" name="DrName" 
+                                       class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus"
+                                       placeholder="请输入医生姓名">
+                            </div>
+                        </div>
+                        
+                        <!-- 性别 -->
+                        <div>
+                            <label for="Gender" class="block text-sm font-medium text-secondary mb-1">性别</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-venus-mars"></i>
+                                </span>
+                                <select id="Gender" name="xb" 
+                                        class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus appearance-none">
+                                    <option value="">请选择性别</option>
+                                    <option value="男">男</option>
+                                    <option value="女">女</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-secondary">
+                                    <i class="fa fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 职位 -->
+                        <div>
+                            <label for="Position" class="block text-sm font-medium text-secondary mb-1">职位</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-briefcase"></i>
+                                </span>
+                                <input type="text" id="Position" name="zw" 
+                                       class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus"
+                                       placeholder="请输入职位">
+                            </div>
+                        </div>
+                        
+                        <!-- 科室 -->
+                        <div>
+                            <label for="Department" class="block text-sm font-medium text-secondary mb-1">科室</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-hospital-o"></i>
+                                </span>
+                                <select id="Department" name="ks" 
+                                        class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus appearance-none">
+                                    <option value="">请选择科室</option>
+                                    <option value="人事部">人事部</option>
+                                    <option value="后勤部">后勤部</option>
+                                    <option value="手术部">手术部</option>
+                                    <option value="药物部">药物部</option>
+                                    <option value="护理部">护理部</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-secondary">
+                                    <i class="fa fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 生日 -->
+                        <div>
+                            <label for="Birthday" class="block text-sm font-medium text-secondary mb-1">生日</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                                <input type="date" id="Birthday" name="sr" 
+                                       class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus">
+                            </div>
+                        </div>
+                        
+                        <!-- 工作时间 -->
+                        <div>
+                            <label for="WorkTime" class="block text-sm font-medium text-secondary mb-1">工作时间</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-clock-o"></i>
+                                </span>
+                                <input type="text" id="WorkTime" name="gzsj" 
+                                       class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus"
+                                       placeholder="例如：周一至周五 上午8:00-12:00">
+                            </div>
+                        </div>
+                        
+                        <!-- 进单位时间 -->
+                        <div>
+                            <label for="JoinDate" class="block text-sm font-medium text-secondary mb-1">进单位时间</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-calendar-check-o"></i>
+                                </span>
+                                <input type="date" id="JoinDate" name="jdwsj" 
+                                       class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus">
+                            </div>
+                        </div>
+                        
+                        <!-- 工资 -->
+                        <div>
+                            <label for="Salary" class="block text-sm font-medium text-secondary mb-1">工资</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-money"></i>
+                                </span>
+                                <input type="number" id="Salary" name="qian" 
+                                       class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus"
+                                       placeholder="请输入月工资">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 备注 -->
+                    <div>
+                        <label for="Remark" class="block text-sm font-medium text-secondary mb-1">备注</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                <i class="fa fa-comment-o"></i>
+                            </span>
+                            <textarea id="Remark" name="about" rows="3" 
+                                      class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus"
+                                      placeholder="请输入备注信息"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- 按钮区域 -->
+                    <div class="flex justify-end space-x-4 pt-4">
+                        <button type="button" 
+                                class="px-6 py-3 bg-white border border-gray-300 rounded-lg text-dark font-medium hover:bg-gray-50 transition-colors">
+                            取消
+                        </button>
+                        <button type="submit" 
+                                class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg btn-hover flex items-center justify-center">
+                            <i class="fa fa-check mr-2"></i>确认提交
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-center md:text-left mb-4 md:mb-0">
+                    <p class="text-secondary text-sm">&copy; 2025 医院管理系统 版权所有</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-secondary hover:text-primary transition-colors">
+                        <i class="fa fa-question-circle"></i> 帮助中心
+                    </a>
+                    <a href="#" class="text-secondary hover:text-primary transition-colors">
+                        <i class="fa fa-phone"></i> 联系我们
+                    </a>
+                    <a href="#" class="text-secondary hover:text-primary transition-colors">
+                        <i class="fa fa-shield"></i> 隐私政策
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 移动端菜单切换
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 为按钮添加悬停动画
+        document.querySelectorAll('.btn-hover').forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                btn.classList.add('shadow-md', '-translate-y-0.5');
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.classList.remove('shadow-md', '-translate-y-0.5');
+            });
+        });
+    </script>
+</body>
+</html>

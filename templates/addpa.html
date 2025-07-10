@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>患者信息管理 | 医院管理系统</title>
+    
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#6B7280',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                        light: '#F9FAFB',
+                        dark: '#1F2937'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .form-input-focus {
+                @apply focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-inter text-dark">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-primary text-white shadow-md">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <!-- 左侧Logo和标题 -->
+                <div class="flex items-center space-x-2">
+                    <i class="fa fa-hospital-o text-xl"></i>
+                    <span class="text-lg font-bold">医院管理系统</span>
+                </div>
+                
+                <!-- 中间导航链接 -->
+                <div class="flex items-center space-x-1">
+                    <a href="{% url 's_home' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">首页</a>
+                    <a href="{% url 's_patient' %}" class="px-3 py-2 rounded-md text-sm font-medium bg-primary/20 text-white">患者管理</a>
+                    <a href="{% url 's_bed' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">床位管理</a>
+                    <a href="{% url 's_Dr' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">医生管理</a>
+                    <a href="{% url 's_gongju' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">工具管理</a>
+                    <a href="{% url 's_med' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">药物管理</a>
+                </div>
+                
+                <!-- 右侧用户信息 -->
+                <div class="flex items-center space-x-4">
+                    <!-- 通知图标 -->
+                    <button class="p-1 relative">
+                        <i class="fa fa-bell-o text-lg"></i>
+                        <span class="absolute top-0 right-0 h-2 w-2 bg-danger rounded-full"></span>
+                    </button>
+                    
+                    <!-- 用户信息 -->
+                    <div class="flex items-center space-x-2">
+                        <img src="https://picsum.photos/200/200?random=1" alt="用户头像" class="h-8 w-8 rounded-full object-cover border-2 border-white shadow-sm">
+                        <span>张医生</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 页面标题 -->
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-dark mb-2">患者信息管理</h1>
+            <p class="text-secondary">添加或更新患者基本信息</p>
+        </div>
+        
+        <!-- 患者信息表单 -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="p-6">
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- 表单标题 -->
+                    <h2 class="text-xl font-semibold text-dark mb-4">患者基本信息</h2>
+                    
+                    <!-- 表单内容 -->
+                    <div class="grid grid-cols-2 gap-6">
+                        <!-- 姓名 -->
+                        <div>
+                            <label for="PaName" class="block text-sm font-medium text-secondary mb-1">姓名</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                                <input type="text" id="PaName" name="PaName" 
+                                       class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus"
+                                       placeholder="请输入患者姓名">
+                            </div>
+                        </div>
+                        
+                        <!-- 性别 -->
+                        <div>
+                            <label for="Gender" class="block text-sm font-medium text-secondary mb-1">性别</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-venus-mars"></i>
+                                </span>
+                                <select id="Gender" name="Gender" 
+                                        class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus appearance-none">
+                                    <option value="">请选择性别</option>
+                                    <option value="男">男</option>
+                                    <option value="女">女</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-secondary">
+                                    <i class="fa fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 科室 -->
+                        <div>
+                            <label for="KName" class="block text-sm font-medium text-secondary mb-1">科室</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-hospital-o"></i>
+                                </span>
+                                <select id="KName" name="KName" 
+                                        class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus appearance-none">
+                                    <option value="">请选择科室</option>
+                                    <option value="眼科">眼科</option>
+                                    <option value="口腔科">口腔科</option>
+                                    <option value="皮肤科">皮肤科</option>
+                                    <option value="体检科">体检科</option>
+                                    <option value="康复科">康复科</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-secondary">
+                                    <i class="fa fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 详情 -->
+                        <div>
+                            <label for="Condition" class="block text-sm font-medium text-secondary mb-1">详情</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-file-text-o"></i>
+                                </span>
+                                <input type="text" id="Condition" name="Condition" 
+                                       class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus"
+                                       placeholder="请输入患者详情">
+                            </div>
+                        </div>
+                        
+                        <!-- 主治大夫 -->
+                        <div>
+                            <label for="Dr" class="block text-sm font-medium text-secondary mb-1">主治大夫</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-user-md"></i>
+                                </span>
+                                <input type="text" id="Dr" name="Dr" 
+                                       class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus"
+                                       placeholder="请输入主治大夫">
+                            </div>
+                        </div>
+                        
+                        <!-- 病床号 -->
+                        <div>
+                            <label for="BID" class="block text-sm font-medium text-secondary mb-1">病床号</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                    <i class="fa fa-bed"></i>
+                                </span>
+                                <input type="text" id="BID" name="BID" 
+                                       class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus"
+                                       placeholder="请输入病床号">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 按钮区域 -->
+                    <div class="flex justify-end space-x-4 pt-4">
+                        <button type="button" 
+                                class="px-6 py-3 bg-white border border-gray-300 rounded-lg text-dark font-medium hover:bg-gray-50 transition-colors">
+                            取消
+                        </button>
+                        <button type="submit" 
+                                class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg flex items-center justify-center">
+                            <i class="fa fa-check mr-2"></i>确认
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-secondary text-sm">&copy; 2025 医院管理系统 版权所有</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-secondary hover:text-primary transition-colors">
+                        <i class="fa fa-question-circle"></i> 帮助中心
+                    </a>
+                    <a href="#" class="text-secondary hover:text-primary transition-colors">
+                        <i class="fa fa-phone"></i> 联系我们
+                    </a>
+                    <a href="#" class="text-secondary hover:text-primary transition-colors">
+                        <i class="fa fa-shield"></i> 隐私政策
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 为按钮添加悬停效果
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                btn.classList.add('shadow-md');
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.classList.remove('shadow-md');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医疗工具管理 | 医院管理系统</title>
+    
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#6B7280',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                        light: '#F9FAFB',
+                        dark: '#1F2937'
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .form-input-focus {
+                @apply focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-dark">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-primary text-white shadow-md">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fa fa-hospital-o text-xl mr-2"></i>
+                    <span class="text-lg font-bold">医院管理系统</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="text-white hover:text-gray-200 transition-colors">首页</a>
+                    <a href="#" class="text-white hover:text-gray-200 transition-colors">患者管理</a>
+                    <a href="#" class="text-white hover:text-gray-200 transition-colors">床位管理</a>
+                    <a href="#" class="text-white hover:text-gray-200 transition-colors">医生管理</a>
+                    <a href="#" class="text-white hover:text-gray-200 transition-colors">工具管理</a>
+                    <a href="#" class="text-white hover:text-gray-200 transition-colors">药物管理</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 页面标题 -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-dark mb-2">医疗工具管理</h1>
+            <p class="text-secondary">搜索并删除医疗工具</p>
+        </div>
+        
+        <!-- 警告提示 -->
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fa fa-exclamation-triangle text-red-500"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">重要提示</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <p>删除工具将永久移除其记录，请谨慎操作。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 搜索表单 -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden max-w-2xl mx-auto">
+            <div class="p-6">
+                <h2 class="text-xl font-semibold text-dark mb-4">搜索要删除的工具</h2>
+                
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    
+                    <div>
+                        <label for="GName" class="block text-sm font-medium text-secondary mb-1">工具名称</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input type="text" id="GName" name="GName" 
+                                   class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus"
+                                   placeholder="请输入工具名称...">
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4 pt-4">
+                        <button type="button" 
+                                class="px-6 py-3 bg-white border border-gray-300 rounded-lg text-dark font-medium hover:bg-gray-50 transition-colors">
+                            取消
+                        </button>
+                        <button type="submit" 
+                                class="px-6 py-3 bg-danger hover:bg-danger/90 text-white font-medium rounded-lg flex items-center justify-center">
+                            <i class="fa fa-trash mr-2"></i>删除
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-secondary text-sm">&copy; 2025 医院管理系统 版权所有</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-secondary hover:text-primary transition-colors">
+                        <i class="fa fa-question-circle"></i> 帮助中心
+                    </a>
+                    <a href="#" class="text-secondary hover:text-primary transition-colors">
+                        <i class="fa fa-phone"></i> 联系我们
+                    </a>
+                    <a href="#" class="text-secondary hover:text-primary transition-colors">
+                        <i class="fa fa-shield"></i> 隐私政策
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 为按钮添加悬停效果
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                btn.classList.add('shadow-md');
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.classList.remove('shadow-md');
+            });
+        });
+    </script>
+</body>
+</html>
