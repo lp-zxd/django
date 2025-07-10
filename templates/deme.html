@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>删除药物 | 医院管理系统</title>
+    
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#6B7280',
+                        accent: '#3B82F6',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                        light: '#F9FAFB',
+                        dark: '#1F2937',
+                        neutral: '#F3F4F6'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .form-input-focus {
+                @apply focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none;
+            }
+            .btn-hover {
+                @apply hover:shadow-md hover:-translate-y-0.5 transition-all duration-200;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-inter text-dark min-h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-primary text-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <!-- 左侧Logo和标题 -->
+                <div class="flex items-center space-x-2">
+                    <i class="fa fa-hospital-o text-xl"></i>
+                    <span class="text-lg font-bold">医院管理系统</span>
+                </div>
+                
+                <!-- 中间导航链接 -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="{% url 's_home' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">首页</a>
+                    <a href="{% url 's_patient' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">患者管理</a>
+                    <a href="{% url 's_bed' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">床位管理</a>
+                    <a href="{% url 's_Dr' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">医生管理</a>
+                    <a href="{% url 's_gongju' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">工具管理</a>
+                    <a href="{% url 's_med' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">药物管理</a>
+                    <a href="{% url 'deme' %}" class="px-3 py-2 rounded-md text-sm font-medium bg-primary/20 text-white">删除</a>
+                    <a href="{% url 'addme' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">添加</a>
+                    <a href="{% url 'upme' %}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors">更新</a>
+                </div>
+                
+                <!-- 右侧用户信息和通知 -->
+                <div class="flex items-center space-x-4">
+                    <!-- 通知图标 -->
+                    <button class="p-1 relative">
+                        <i class="fa fa-bell-o text-lg"></i>
+                        <span class="absolute top-0 right-0 h-2 w-2 bg-danger rounded-full"></span>
+                    </button>
+                    
+                    <!-- 用户信息 -->
+                    <div class="hidden md:flex items-center space-x-2">
+                        <img src="https://picsum.photos/200/200?random=1" alt="用户头像" class="h-8 w-8 rounded-full object-cover border-2 border-white shadow-sm">
+                        <span>张医生</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <!-- 页面标题 -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-dark mb-2">删除药物</h1>
+            <p class="text-secondary">输入药物名称搜索并删除</p>
+        </div>
+        
+        <!-- 删除药物表单 -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden max-w-2xl mx-auto">
+            <div class="p-6">
+                <div class="mb-4">
+                    <div class="flex items-center text-red-500 mb-2">
+                        <i class="fa fa-exclamation-triangle mr-2"></i>
+                        <span class="font-medium">注意：删除操作将永久移除药物信息，无法恢复</span>
+                    </div>
+                    <p class="text-sm text-secondary">请谨慎操作，确认药物信息无误后再执行删除</p>
+                </div>
+                
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    
+                    <div>
+                        <label for="MName" class="block text-sm font-medium text-secondary mb-1">
+                            <i class="fa fa-medkit mr-1"></i> 药物名称
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input type="text" id="MName" name="MName" 
+                                   class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 form-input-focus"
+                                   placeholder="请输入要删除的药物名称...">
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4 pt-4">
+                        <button type="button" 
+                                class="px-6 py-3 bg-white border border-gray-300 rounded-lg text-dark font-medium hover:bg-gray-50 transition-colors btn-hover">
+                            <i class="fa fa-refresh mr-2"></i> 重置
+                        </button>
+                        <button type="submit" 
+                                class="px-6 py-3 bg-danger hover:bg-danger/90 text-white font-medium rounded-lg flex items-center justify-center btn-hover">
+                            <i class="fa fa-trash mr-2"></i> 删除
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 py-6 mt-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="mb-4 md:mb-0">
+                    <p class="text-secondary text-sm">&copy; 2025 医院管理系统 版权所有</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-secondary hover:text-primary transition-colors">
+                        <i class="fa fa-question-circle"></i> 帮助中心
+                    </a>
+                    <a href="#" class="text-secondary hover:text-primary transition-colors">
+                        <i class="fa fa-phone"></i> 联系我们
+                    </a>
+                    <a href="#" class="text-secondary hover:text-primary transition-colors">
+                        <i class="fa fa-shield"></i> 隐私政策
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 为按钮添加悬停效果
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                btn.classList.add('shadow-md', '-translate-y-0.5');
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.classList.remove('shadow-md', '-translate-y-0.5');
+            });
+        });
+    </script>
+</body>
+</html>
